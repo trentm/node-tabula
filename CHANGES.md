@@ -1,5 +1,10 @@
 # node-tabule changelog
 
+## 1.1.1 (not yet released)
+
+(nothing yet)
+
+
 ## 1.1.0
 
 - Render complex cell values (objects and arrays) with `JSON.stringify(value)`
