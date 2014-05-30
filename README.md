@@ -63,6 +63,8 @@ trent  38
 
 - Describe the "opinions", features and limitations of this module.
 
+- `tabula` CLI for piping in a JSON array of objects, or stream of objects.
+
 - Merge this with [node-tab](https://github.com/davepacheco/node-tab) if
   reasonable. I have some PR work for it (that I haven't completed) to add some
   conveniences that `tabulate` provides. It is silly to have two table-printing
