@@ -33,7 +33,7 @@ ewan   4
 
 # Features
 
-TODO
+TODO: describe these
 
 
 # TODO
@@ -42,8 +42,6 @@ TODO
   totally optional.
 
 - Describe the "opinions" and limitations of this module.
-
-- A few actual tests.
 
 - Merge this with [node-tab](https://github.com/davepacheco/node-tab) if
   reasonable. I have some PR work for it (that I haven't completed) to add some
