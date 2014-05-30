@@ -1,5 +1,10 @@
 # node-tabule changelog
 
+## 1.1.2 (not yet released)
+
+(nothing yet)
+
+
 ## 1.1.1
 
 - Drop debugging code.
