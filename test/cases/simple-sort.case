@@ -1,0 +1,10 @@
+[{"name":"trent","age":38}, {"name":"ewan","age":4}]
+
+NAME   AGE
+ewan   4
+trent  38
+
+{
+    "columns": ["name", "age"],
+    "sort": ["age"]
+}

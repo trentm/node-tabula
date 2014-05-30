@@ -1,0 +1,9 @@
+[{"name":"trent","age":38}, {"name":"ewan","age":4}]
+
+trent  38
+ewan   4
+
+{
+    "columns": ["name", "age"],
+    "skipHeader": true
+}
