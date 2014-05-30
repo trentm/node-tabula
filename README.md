@@ -20,7 +20,7 @@ for updates to node-tabula.
 var tabula = require('tabula');
 
 var data = [{"name":"trent","age":38}, {"name":"ewan","age":4}];
-tabula(data);
+tabula(data, {columns: ["name", "age"]});
 ```
 
 prints the following to stdout
