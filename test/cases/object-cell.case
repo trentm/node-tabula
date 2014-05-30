@@ -1,0 +1,8 @@
+[
+    {"foo":"bar","obj":{"one":1}},
+    {"foo":"baz","obj":{"two":2}}
+]
+
+FOO  OBJ
+bar  {"one":1}
+baz  {"two":2}

@@ -5,9 +5,6 @@ Why another one? I had one that worked for me and wanted to re-use it. Trawling
 through dozens of available ones on npm was a chore I haven't done. I'd welcome
 a table-printing node.js bake off.
 
-Follow <a href="https://twitter.com/intent/user?screen_name=trentmick" target="_blank">@trentmick</a>
-for updates to node-tabula.
-
 
 # Install
 
@@ -19,29 +16,52 @@ for updates to node-tabula.
 ```javascript
 var tabula = require('tabula');
 
-var data = [{"name":"trent","age":38}, {"name":"ewan","age":4}];
-tabula(data, {columns: ["name", "age"]});
-```
+var items = [
+    {name: 'trent', age: 38, game: 'hockey'},
+    {name: 'ewan', age: 4, game: 'chess'}
+];
 
-prints the following to stdout
+tabula(items);
+/* prints:
+NAME   AGE  GAME
+trent  38   hockey
+ewan   4    chess
+*/
 
-```
+tabula(items, {columns: ['name', 'age']});
+/* prints:
 NAME   AGE
 trent  38
 ewan   4
+*/
+
+tabula(items, {
+    columns: ['name', 'age'],
+    skipHeader: true
+});
+/* prints:
+trent  38
+ewan   4
+*/
+
+// Sort by age. Attempts numeric sort on given fields.
+// Note: This actually sorts the given `items` array in-place.
+tabula(items, {
+    columns: ['name', 'age'],
+    sort: ['age']
+});
+/* prints:
+NAME   AGE
+ewan   4
+trent  38
+*/
 ```
 
-# Features
-
-TODO: describe these
 
 
 # TODO
 
-- Allow options.columns be optional (keys from first row). The options is
-  totally optional.
-
-- Describe the "opinions" and limitations of this module.
+- Describe the "opinions", features and limitations of this module.
 
 - Merge this with [node-tab](https://github.com/davepacheco/node-tab) if
   reasonable. I have some PR work for it (that I haven't completed) to add some
