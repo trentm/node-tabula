@@ -1,9 +1,9 @@
 # node-tabule changelog
 
-## 1.0.1 (not yet released)
+## 1.1.0 (not yet released)
 
-- Render complex cell values (objects and arrays) with `JSON.stringify(value)`.
-  E.g.:
+- Render complex cell values (objects and arrays) with `JSON.stringify(value)`
+  and functions a la `util.inspect()`. E.g.:
 
         tabula([
             {"foo":"bar","obj":{"one":1}},
