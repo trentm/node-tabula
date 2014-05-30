@@ -2,7 +2,7 @@
 
 ## 1.1.1 (not yet released)
 
-(nothing yet)
+- Drop debugging code.
 
 
 ## 1.1.0
