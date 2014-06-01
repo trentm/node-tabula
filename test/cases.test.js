@@ -65,7 +65,7 @@ cases.forEach(function (c) {
 
 test('manual case: function-cell', function (t) {
     var items = [
-        {foo: "bar", func: function aFunc() {}}
+        {foo: 'bar', func: function aFunc() {}}
     ];
     var table = tabula.format(items);
     t.equal(table, 'FOO  FUNC\nbar  [Function: aFunc]\n');
