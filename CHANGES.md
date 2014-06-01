@@ -1,5 +1,10 @@
 # node-tabule changelog
 
+## 1.2.1 (not yet released)
+
+(nothing yet)
+
+
 ## 1.2.0
 
 - Add a (mostly for play) `tabula` CLI that can be used for emitting a table
