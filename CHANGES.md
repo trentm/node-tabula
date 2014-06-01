@@ -1,6 +1,6 @@
 # node-tabule changelog
 
-## 1.2.0 (not yet released)
+## 1.2.0
 
 - Add a (mostly for play) `tabula` CLI that can be used for emitting a table
   from a stream of JSON objects (or a single JSON array). E.g.
