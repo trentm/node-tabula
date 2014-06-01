@@ -58,12 +58,42 @@ trent  38
 ```
 
 
+# `tabula` CLI
+
+There is also a `tabula` CLI that can be used for emitting a table
+from a stream of JSON objects (or a single JSON array). E.g.:
+
+    $ echo '[{"name":"trent","age":38}, {"name":"ewan","age":4}]' | tabula
+    NAME   AGE
+    trent  38
+    ewan   4
+
+    # column selection
+    $ echo '[{"name":"trent","age":38}, {"name":"ewan","age":4}]' | tabula name
+    NAME
+    trent
+    ewan
+
+    # sorting
+    $ echo '[{"name":"trent","age":38}, {"name":"ewan","age":4}]' | tabula -s age
+    NAME   AGE
+    ewan   4
+    trent  38
+
+
 
 # TODO
 
 - Describe the "opinions", features and limitations of this module.
 
 - `tabula` CLI for piping in a JSON array of objects, or stream of objects.
+    - streaming
+    - option for skipping non-JSON lines (e.g. for bunyan logs)
+    - option for non-JSON input? e.g. space separated ('json -ga foo bar'
+      output, output from other table-emitting things, perhaps then 2-space
+      or more separated), naive-csv
+    - separate tabula-cli module?
+    - test cases
 
 - Merge this with [node-tab](https://github.com/davepacheco/node-tab) if
   reasonable. I have some PR work for it (that I haven't completed) to add some

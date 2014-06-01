@@ -1,9 +1,26 @@
 # node-tabule changelog
 
-## 1.1.2 (not yet released)
+## 1.2.0 (not yet released)
 
-(nothing yet)
+- Add a (mostly for play) `tabula` CLI that can be used for emitting a table
+  from a stream of JSON objects (or a single JSON array). E.g.
 
+        $ echo '[{"name":"trent","age":38}, {"name":"ewan","age":4}]' | tabula
+        NAME   AGE
+        trent  38
+        ewan   4
+
+        # column selection
+        $ echo '[{"name":"trent","age":38}, {"name":"ewan","age":4}]' | tabula name
+        NAME
+        trent
+        ewan
+
+        # sorting
+        $ echo '[{"name":"trent","age":38}, {"name":"ewan","age":4}]' | tabula -s age
+        NAME   AGE
+        ewan   4
+        trent  38
 
 ## 1.1.1
 

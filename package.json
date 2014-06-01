@@ -1,24 +1,33 @@
 {
     "name": "tabula",
     "description": "a light function for printing a text table to stdout",
-    "version": "1.1.2",
+    "version": "1.2.0",
     "author": "Trent Mick <trentm@gmail.com> (http://trentm.com)",
-    "keywords": ["table", "stdout", "tabulate"],
+    "main": "./lib/tabula.js",
+    "bin": {
+        "tabula": "./bin/tabula"
+    },
+    "homepage": "https://github.com/trentm/node-tabula",
+    "keywords": [
+        "table",
+        "stdout",
+        "tabulate"
+    ],
     "repository": {
         "type": "git",
         "url": "git://github.com/trentm/node-tabula.git"
     },
-    "main": "./lib/tabula.js",
+    "engines": {
+        "node": ">=0.10"
+    },
     "dependencies": {
-        "assert-plus": "0.1.5",
+        "assert-plus": "0.1.x",
+        "dashdash": "1.5.x",
         "extsprintf": "1.0.3"
     },
     "devDependencies": {
         "nodeunit": "0.9.x",
         "glob": "4.0.x"
-    },
-    "engines": {
-        "node": ">=0.8"
     },
     "scripts": {
         "test": "make test"

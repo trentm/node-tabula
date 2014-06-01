@@ -1,0 +1,218 @@
+#!/usr/bin/env node
+/**
+ * -*- mode: js -*-
+ *
+ * tabula -- filter a stream of JSON objects into a formatted text table
+ */
+
+var p = console.log;
+var debug = console.warn;
+//var debug = function () {};
+
+var assert = require('assert-plus');
+var dashdash = require('dashdash');
+var util = require('util');
+
+var pkg = require('../package.json');
+var LineStream = require('../lib/linestream');
+var tabula = require('../lib/tabula');
+
+
+
+//---- globals and constants
+
+var options = [
+    {
+        name: 'version',
+        type: 'bool',
+        help: 'Print tabula version and exit.'
+    },
+    {
+        names: ['help', 'h'],
+        type: 'bool',
+        help: 'Print this help and exit.'
+    },
+    {
+        names: ['sort', 's'],
+        type: 'arrayOfString',
+        help: 'Sort on the given field. Can be specified multiple times.',
+        helpArg: 'FIELD'
+    },
+    {
+        names: ['H'],
+        type: 'bool',
+        help: 'Skip header.',
+    // TODO
+    //},
+    //{
+    //    names: ['file', 'f'],
+    //    type: 'string',
+    //    help: 'File to process',
+    //    helpArg: 'FILE'
+    }
+];
+
+
+
+//---- support functions
+
+/**
+ * A hacked up version of 'process.exit' that will first drain stdout
+ * before exiting. *WARNING: This doesn't stop event processing.* IOW,
+ * callers have to be careful that code following this call isn't
+ * accidentally executed.
+ */
+function drainStdoutAndExit(code) {
+    debug('(drainStdoutAndExit(%d))', code);
+    stdout.on('drain', function () {
+        cleanupAndExit(code);
+    });
+    if (stdoutFlushed) {
+        cleanupAndExit(code);
+    }
+}
+
+
+/**
+ * A hacked up version of 'process.exit' that will first drain stdout
+ * before exiting. *WARNING: This doesn't stop event processing.* IOW,
+ * callers have to be careful that code following this call isn't
+ * accidentally executed.
+ */
+var _drainingStdout = false;
+function drainStdoutAndExit(stdout, code) {
+    if (_drainingStdout) {
+        return;
+    }
+    _drainingStdout = true;
+    stdout.on('drain', function () {
+        process.exit(code);
+    });
+    stdout.on('close', function () {
+        process.exit(code);
+    });
+    stdout.write('');
+    //XXX needed?
+    //if (stdoutFlushed) {
+    //    process.exit(code);
+    //}
+}
+
+
+
+
+// ---- mainline
+
+function main(argv) {
+    var parser = dashdash.createParser({options: options});
+    try {
+        var opts = parser.parse(process.argv);
+    } catch (e) {
+        console.error('tabula: error: %s', e.message);
+        process.exit(1);
+    }
+
+    if (opts.help) {
+        var help = parser.help({includeEnv: true}).trimRight();
+        p('usage:\n'
+            + '    tabula [<options>]\n'
+            + '\n'
+            + 'options:\n'
+            + help);
+        process.exit(0);
+    } else if (opts.version) {
+        p('tabula ' + pkg.version);
+        p(pkg.homepage);
+        process.exit(0);
+    }
+
+    var columns;
+    if (opts._args.length) {
+        columns = opts._args;
+    }
+
+    // Stdout error handling.
+    var stdout = process.stdout;
+    stdout.on('error', function (err) {
+        debug('(stdout error event: %s)', err);
+        if (err.code === 'EPIPE') {
+            drainStdoutAndExit(stdout, 0);
+        } else {
+            console.warn(err);
+            drainStdoutAndExit(stdout, 1);
+        }
+    });
+
+    if (opts.file) {
+        XXX  // TODO
+        var files = opts.args;
+        files.forEach(function (file) {
+            streams[file] = { stream: null, records: [], done: false }
+        });
+        asyncForEach(files,
+            function (file, next) {
+                processFile(file, opts, stylize, function (err) {
+                    if (err) {
+                        warn('bunyan: %s', err.message);
+                        retval += 1;
+                    }
+                    next();
+                });
+            },
+            function (err) {
+                if (err) {
+                    warn('bunyan: unexpected error: %s', err.stack || err);
+                    return drainStdoutAndExit(stdout, 1);
+                }
+                process.exit(retval);
+            }
+        );
+    } else {
+        var lstream = new LineStream({encoding: 'utf8'});
+        lstream.on('error', function (err) {
+            warn(err);
+            drainStdoutAndExit(1);
+        });
+
+        var oneArray = undefined;
+        var items = [];
+        var lines = [];
+        lstream.on('line', function (line) {
+            line = line.trim();
+            if (!line) {
+                return;
+            }
+            if (oneArray === undefined) {  //XXX use .once() for this setup?
+                if (line[0] === '[') {
+                    oneArray = true;
+                }
+            }
+            if (oneArray) {
+                // TODO: would be faster to NOT lstream now, but just chunks.
+                lines.push(line);
+            } else {
+                // TODO: *streaming* into tabula
+                items.push(JSON.parse(line));
+            }
+        });
+
+        //XXX I thought this needed to be `lstream.once('end', ...)` but that
+        //    does nothing for me!?
+        process.stdin.once('end', function () {
+            if (oneArray) {
+                items = JSON.parse(lines.join('\n'));
+            }
+            tabula(items, {
+                columns: columns,
+                sort: opts.sort,
+                skipHeader: opts.H
+            });
+        });
+
+        process.stdin.pipe(lstream);
+    }
+}
+
+if (require.main === module) {
+    main(process.argv);
+}
