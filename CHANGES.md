@@ -2,7 +2,10 @@
 
 ## 1.2.1 (not yet released)
 
-(nothing yet)
+- Export `sortArrayOfObjects` function. This is used internally for `opts.sort`
+  handling, however it might be useful in CLIs that want to sort in the same
+  way as table formatting would even if not using table formatting. E.g. a
+  CLI that has a "-j, --json" option to emit JSON.
 
 
 ## 1.2.0
