@@ -1,6 +1,6 @@
 # node-tabule changelog
 
-## 1.2.1 (not yet released)
+## 1.2.1
 
 - Export `sortArrayOfObjects` function. This is used internally for `opts.sort`
   handling, however it might be useful in CLIs that want to sort in the same
