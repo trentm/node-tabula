@@ -1,6 +1,6 @@
 # node-tabule changelog
 
-## 1.2.2 (not yet released)
+## 1.2.2
 
 - Return an empty string from `tabulaFormat` if the given array if items is empty.
   Otherwise `tabulaPrint` blows up trying to write `undefined`.
