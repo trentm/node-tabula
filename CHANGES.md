@@ -1,5 +1,10 @@
 # node-tabule changelog
 
+## 1.2.3 (not yet released)
+
+(nothing yet)
+
+
 ## 1.2.2
 
 - Return an empty string from `tabulaFormat` if the given array if items is empty.
