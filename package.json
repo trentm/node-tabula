@@ -21,9 +21,9 @@
         "node": ">=0.10"
     },
     "dependencies": {
-        "assert-plus": "0.1.x",
-        "dashdash": "1.5.x",
-        "extsprintf": "1.0.3"
+        "assert-plus": "0.1.5",
+        "dashdash": "1.6.0",
+        "extsprintf": "1.2.0"
     },
     "devDependencies": {
         "nodeunit": "0.9.x",
