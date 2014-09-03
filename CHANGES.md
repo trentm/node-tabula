@@ -1,8 +1,30 @@
 # node-tabule changelog
 
-## 1.2.3 (not yet released)
+## 1.3.0 (not yet released)
 
-(nothing yet)
+- New `dottedLookup` boolean option to support looking up properties of objects
+  in the row data.
+
+        $ echo '[{"name":{"first":"trent","last":"mick"},"age":38},
+            {"name":{"first":"ewan"},"age":4}]' \
+            | tabula name.first age --dotted-lookup
+        NAME.FIRST  AGE
+        trent       38
+        ewan        4
+
+  Without this option:
+
+
+        $ echo '[{"name":{"first":"trent","last":"mick"},"age":38},
+            {"name":{"first":"ewan"},"age":4}]' \
+            | tabula name.first age
+        NAME.FIRST  AGE
+        -           38
+        -           4
+
+  In node.js code this looks like:
+
+        tabula(rows, {dottedLookup: true, ...})
 
 
 ## 1.2.2

@@ -41,15 +41,21 @@ var options = [
     {
         names: ['H'],
         type: 'bool',
-        help: 'Skip header.',
+        help: 'Skip header.'
+    },
+    {
+        names: ['dotted-lookup'],
+        type: 'bool',
+        help: 'Support dotted lookup for fields. I.e. "foo.bar" means "the '
+            + 'bar property of the foo object".'
+    }
     // TODO
-    //},
     //{
     //    names: ['file', 'f'],
     //    type: 'string',
     //    help: 'File to process',
     //    helpArg: 'FILE'
-    }
+    //}
 ];
 
 
@@ -205,7 +211,8 @@ function main(argv) {
             tabula(items, {
                 columns: columns,
                 sort: opts.sort,
-                skipHeader: opts.H
+                skipHeader: opts.H,
+                dottedLookup: opts.dotted_lookup
             });
         });
 

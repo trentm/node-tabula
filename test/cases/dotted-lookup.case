@@ -1,0 +1,11 @@
+[{"name":{"first":"trent","last":"mick"},"age":38},
+ {"name":{"first":"ewan"},"age":4}]
+
+NAME.FIRST  AGE
+trent       38
+ewan        4
+
+{
+    "columns": ["name.first", "age"],
+    "dottedLookup": true
+}
