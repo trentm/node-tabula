@@ -1,6 +1,6 @@
 # node-tabule changelog
 
-## 1.3.0 (not yet released)
+## 1.3.0
 
 - New `dottedLookup` boolean option to support looking up properties of objects
   in the row data.
