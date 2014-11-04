@@ -1,5 +1,10 @@
 # node-tabule changelog
 
+## 1.4.1 (not yet released)
+
+(nothing yet)
+
+
 ## 1.4.0
 
 - Entries in the `columns` array option to `tabula()` and `tabulaFormat()` can
