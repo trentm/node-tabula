@@ -134,7 +134,20 @@ function main(argv) {
 
     var columns;
     if (opts._args.length) {
-        columns = opts._args;
+        //  "bar" -> {"lookup": "bar"}
+        //  "bar:Bar" -> {"lookup": "bar", "name": "Bar"}
+        columns = [];
+        for (var i = 0; i < opts._args.length; i++) {
+            var sepIdx = opts._args[i].indexOf(':');
+            if (sepIdx === -1) {
+                columns.push({lookup: opts._args[i]});
+            } else {
+                columns.push({
+                    lookup: opts._args[i].slice(0, sepIdx),
+                    name: opts._args[i].slice(sepIdx + 1)
+                });
+            }
+        }
     }
 
     // Stdout error handling.

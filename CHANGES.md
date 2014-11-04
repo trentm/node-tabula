@@ -1,8 +1,28 @@
 # node-tabule changelog
 
-## 1.3.1 (not yet released)
+## 1.4.0 (not yet released)
 
-(nothing yet)
+- Entries in the `columns` array option to `tabula()` and `tabulaFormat()` can
+  now be an object with `lookup` and `name` keys. This allows one to override the
+  default `name = lookup.toUpperCase()`. E.g.:
+
+        var items = [{'name':'trent','age':38}, {'name':'ewan','age':4}];
+        tabula(items, {columns: ['name', {name: 'Age', lookup: 'age'}]});
+
+  to get:
+
+        NAME   Age
+        trent  38
+        ewan   4
+
+  Support for specifying the `name` was added to the `tabula` CLI:
+
+        $ echo '[{"name":"trent","age":38}, {"name":"ewan","age":4}]' \
+            | tabula name age:Age
+        NAME   Age
+        trent  38
+        ewan   4
+  
 
 
 ## 1.3.0
