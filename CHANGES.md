@@ -1,6 +1,6 @@
 # node-tabule changelog
 
-## 1.4.0 (not yet released)
+## 1.4.0
 
 - Entries in the `columns` array option to `tabula()` and `tabulaFormat()` can
   now be an object with `lookup` and `name` keys. This allows one to override the
