@@ -2,7 +2,7 @@
 
 ## 1.4.1 (not yet released)
 
-(nothing yet)
+- Fix a breakage in v1.4.0 when `validFields` is specified.
 
 
 ## 1.4.0
