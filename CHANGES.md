@@ -1,5 +1,10 @@
 # node-tabule changelog
 
+## 1.4.2 (not yet released)
+
+(nothing yet)
+
+
 ## 1.4.1
 
 - Fix a breakage in v1.4.0 when `validFields` is specified.
