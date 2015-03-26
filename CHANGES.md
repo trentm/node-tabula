@@ -2,7 +2,7 @@
 
 ## 1.4.2 (not yet released)
 
-(nothing yet)
+- Clean `tabula -h` output.
 
 
 ## 1.4.1
@@ -32,7 +32,7 @@
         NAME   Age
         trent  38
         ewan   4
-  
+
 
 
 ## 1.3.0

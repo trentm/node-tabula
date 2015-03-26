@@ -33,6 +33,11 @@ var options = [
         help: 'Print this help and exit.'
     },
     {
+        names: ['flip'],
+        type: 'bool',
+        hidden: true
+    },
+    {
         names: ['sort', 's'],
         type: 'arrayOfString',
         help: 'Sort on the given field. Can be specified multiple times.',
@@ -120,15 +125,27 @@ function main(argv) {
 
     if (opts.help) {
         var help = parser.help({includeEnv: true}).trimRight();
-        p('usage:\n'
-            + '    tabula [<options>]\n'
+        p('Filter a JSON object stream into a table, with a column for each\n'
+            + 'key, or selected keys. The input must be either a JSON array\n'
+            + 'of objects or a newline-separated JSON object with one object\n'
+            + 'per line.\n'
+            + '\n'
+            + 'usage:\n'
+            + '    tabula [<options>] [<keys>...]\n'
             + '\n'
             + 'options:\n'
-            + help);
+            + help + '\n'
+            + '\n'
+            + 'example:\n'
+            // JSSTYLED
+            + '    $ echo \'[{"name":"Trent","age":41},{"name":"Ewan","age":7}]\' | tabula');
         process.exit(0);
     } else if (opts.version) {
         p('tabula ' + pkg.version);
         p(pkg.homepage);
+        process.exit(0);
+    } else if (opts.flip) {
+        p('(╯°□°)╯︵ ┻━┻');
         process.exit(0);
     }
 
