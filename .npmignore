@@ -1,0 +1,8 @@
+/tmp
+/tabula-*.tgz
+/.gitignore
+/.npmignore
+/Makefile
+/tools
+/AUTHORS
+/test
