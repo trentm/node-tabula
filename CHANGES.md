@@ -1,5 +1,10 @@
 # node-tabule changelog
 
+## 1.4.3 (not yet released)
+
+(nothing yet)
+
+
 ## 1.4.2
 
 - Clean `tabula -h` output.
