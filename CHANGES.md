@@ -2,8 +2,7 @@
 
 ## 1.4.3 (not yet released)
 
-(nothing yet)
-
+- Add example with custom column names to `--help` output.
 
 ## 1.4.2
 

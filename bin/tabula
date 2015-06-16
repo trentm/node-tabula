@@ -130,15 +130,26 @@ function main(argv) {
             + 'of objects or a newline-separated JSON object with one object\n'
             + 'per line.\n'
             + '\n'
-            + 'usage:\n'
+            + 'Usage:\n'
             + '    tabula [<options>] [<keys>...]\n'
             + '\n'
-            + 'options:\n'
+            + 'Options:\n'
             + help + '\n'
             + '\n'
-            + 'example:\n'
+            + 'Examples:\n'
             // JSSTYLED
-            + '    $ echo \'[{"name":"Trent","age":41},{"name":"Ewan","age":7}]\' | tabula');
+            + '    $ echo \'[{"name":"Trent","age":41},{"name":"Ewan","age":7}]\' | tabula\n'
+            + '    NAME   AGE\n'
+            + '    Trent  41\n'
+            + '    Ewan   7\n'
+            + '\n'
+            + '    # Explicit list columns. Use "lookup:name" to set column\n'
+            + '    # header "name".\n'
+            // JSSTYLED
+            + '    $ echo \'[{"name":"Trent","age":41},{"name":"Ewan","age":7}]\' | tabula name age:YEARS\n'
+            + '    NAME   YEARS\n'
+            + '    Trent  41\n'
+            + '    Ewan   7');
         process.exit(0);
     } else if (opts.version) {
         p('tabula ' + pkg.version);
