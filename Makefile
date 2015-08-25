@@ -1,6 +1,6 @@
 
 NODEUNIT = ./node_modules/.bin/nodeunit
-JSSTYLE_FILES := $(shell find lib test -name "*.js" | grep -v lib/linestream.js)
+JSSTYLE_FILES := $(shell find lib test -name "*.js")
 NODEOPT ?= $(HOME)/opt
 
 

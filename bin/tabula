@@ -14,7 +14,7 @@ var dashdash = require('dashdash');
 var util = require('util');
 
 var pkg = require('../package.json');
-var LineStream = require('../lib/linestream');
+var LineStream = require('lstream');
 var tabula = require('../lib/tabula');
 
 

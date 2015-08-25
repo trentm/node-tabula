@@ -23,7 +23,8 @@
     "dependencies": {
         "assert-plus": "0.1.x",
         "dashdash": "1.x >=1.8",
-        "extsprintf": "1.x"
+        "extsprintf": "1.x",
+        "lstream": "0.0.4"
     },
     "devDependencies": {
         "nodeunit": "0.9.x",
@@ -31,5 +32,6 @@
     },
     "scripts": {
         "test": "make test"
-    }
+    },
+    "license": "MIT"
 }
