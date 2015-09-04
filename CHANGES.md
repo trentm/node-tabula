@@ -1,6 +1,6 @@
 # node-tabula changelog
 
-## 1.5.0 (not yet released)
+## 1.5.0
 
 - [pull #2] allow empty data with column headers.
 - Add example with custom column names to `--help` output.
