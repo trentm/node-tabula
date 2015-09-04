@@ -57,6 +57,9 @@ trent  38
 */
 ```
 
+TODO: document dottedLookup
+TODO: document align=right
+
 
 # `tabula` CLI
 

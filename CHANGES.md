@@ -1,8 +1,18 @@
 # node-tabula changelog
 
-## 1.5.1 (not yet released)
+## 1.6.0 (not yet released)
 
-(nothing yet)
+- Support for right-aligned columns. The default `align` is "left".
+
+        tabula(items, {
+            columns: [
+                'name',
+                {
+                    lookup: 'size',
+                    align: 'right'
+                }
+            ]
+        });
 
 
 ## 1.5.0

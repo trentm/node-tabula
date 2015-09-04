@@ -1,0 +1,14 @@
+[{"name":"trent","age":38,"fav":"blue"},
+ {"name":"ewan","age":4,"fav":"red"}]
+
+NAME   AGE  FAV
+trent   38  blue
+ewan     4  red
+
+{
+    "columns": [
+        "name",
+        {"lookup":"age", "align":"right"},
+        {"lookup":"fav", "align":"left"}
+    ]
+}
