@@ -1,5 +1,10 @@
 # node-tabula changelog
 
+## 1.6.1 (not yet released)
+
+(nothing yet)
+
+
 ## 1.6.0
 
 - Support for right-aligned columns. The default `align` is "left".
