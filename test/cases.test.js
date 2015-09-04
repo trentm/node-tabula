@@ -40,7 +40,7 @@ var cases = caseFiles.map(function (caseFile) {
         name: path.basename(caseFile).slice(0, -5),
         items: JSON.parse(data[0]),
         expect: {
-            stdout: data[1].trim() + '\n'
+            stdout: (data[1] ? data[1].trim() + '\n' : '')
         },
         options: (data[2] ? JSON.parse(data[2]) : undefined)
     };
