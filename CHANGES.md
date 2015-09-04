@@ -1,5 +1,10 @@
 # node-tabula changelog
 
+## 1.5.1 (not yet released)
+
+(nothing yet)
+
+
 ## 1.5.0
 
 - [pull #2] allow empty data with column headers.
