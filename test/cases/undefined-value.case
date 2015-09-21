@@ -1,0 +1,12 @@
+[
+    {"name":"trent","github":"trentm"},
+    {"name":"dave","github":"bahamas10","color":"red"}
+]
+
+NAME   GITHUB     COLOR
+trent  trentm     -
+dave   bahamas10  red
+
+{
+    "columns": ["name", "github", "color"]
+}

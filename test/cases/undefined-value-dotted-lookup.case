@@ -1,0 +1,13 @@
+[
+    {"o":{"name":"trent","github":"trentm"}},
+    {"o":{"name":"dave","github":"bahamas10","color":"red"}}
+]
+
+O.NAME  O.GITHUB   O.COLOR
+trent   trentm     -
+dave    bahamas10  red
+
+{
+    "columns": ["o.name", "o.github", "o.color"],
+    "dottedLookup": true
+}
