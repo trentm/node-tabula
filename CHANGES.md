@@ -2,8 +2,7 @@
 
 ## 1.6.1 (not yet released)
 
-(nothing yet)
-
+- [pull #3] Don't error on failed lookup (by Dave Eddy).
 
 ## 1.6.0
 
