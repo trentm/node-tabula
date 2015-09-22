@@ -1,6 +1,6 @@
 # node-tabula changelog
 
-## 1.6.1 (not yet released)
+## 1.6.1
 
 - [pull #3] Don't error on failed lookup (by Dave Eddy).
 
