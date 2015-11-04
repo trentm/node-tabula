@@ -59,6 +59,7 @@ trent  38
 
 TODO: document dottedLookup
 TODO: document align=right
+TODO: document opts.noAnsi
 
 
 # `tabula` CLI
@@ -83,6 +84,27 @@ from a stream of JSON objects (or a single JSON array). E.g.:
     ewan   4
     trent  38
 
+
+# Features
+
+This section is an (incomplete) list and demo of some of tabula's features.
+
+
+## ANSI escape codes
+
+`tabula` (as of version 1.7.0) properly calculates widths for cells using
+ANSI escape codes for coloring. E.g. try this sample:
+
+```
+var tabula = require('tabula');
+function red(s) {
+    return '\033[31m' + s + '\033[39m';
+}
+tabula([
+    { name: 'Trent', age: 42, job: 'Engineer' },
+    { name: 'Ewan', age: red(8), job: 'Student' },
+]);
+```
 
 
 # TODO

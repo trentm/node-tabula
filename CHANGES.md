@@ -1,8 +1,9 @@
 # node-tabula changelog
 
-## 1.6.2 (not yet released)
+## 1.7.0 (not yet released)
 
-(nothing yet)
+- Support for ANSI escape codes (used for colouring) in table cells.
+  Before this change, the table cell widths would get messed up.
 
 
 ## 1.6.1
