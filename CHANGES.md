@@ -1,5 +1,10 @@
 # node-tabula changelog
 
+## 1.8.1 (not yet released)
+
+(nothing yet)
+
+
 ## 1.8.0
 
 - Support `width` and `maxWidth` optional column parameters. The former
