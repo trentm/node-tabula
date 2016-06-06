@@ -57,9 +57,12 @@ trent  38
 */
 ```
 
-TODO: document dottedLookup
-TODO: document align=right
-TODO: document opts.noAnsi
+# TODO
+
+- document dottedLookup
+- document column align=right
+- document opts.noAnsi
+- document column width, maxWidth 
 
 
 # `tabula` CLI

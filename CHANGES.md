@@ -1,9 +1,21 @@
 # node-tabula changelog
 
-## 1.7.1 (not yet released)
+## 1.8.0 (not yet released)
 
-(nothing yet)
+- Support `width` and `maxWidth` optional column parameters. The former
+  hardcodes a width for that column -- overriding the calculation of the
+  width from the column name and cell values. The latter sets an upper
+  limit on that calculated value. For example:
 
+        tabula(items, {
+            columns: [
+                {
+                    lookup: 'name',
+                    maxWidth: 30
+                },
+                'age'
+            ]
+        });
 
 ## 1.7.0
 

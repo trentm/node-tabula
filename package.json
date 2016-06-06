@@ -1,7 +1,7 @@
 {
     "name": "tabula",
     "description": "a light function for printing a text table to stdout",
-    "version": "1.7.1",
+    "version": "1.8.0",
     "author": "Trent Mick <trentm@gmail.com> (http://trentm.com)",
     "main": "./lib/tabula.js",
     "bin": {
@@ -21,7 +21,7 @@
         "node": ">=0.10"
     },
     "dependencies": {
-        "assert-plus": "0.1.x",
+        "assert-plus": "^1.0.0",
         "dashdash": "1.x >=1.8",
         "lstream": "0.0.4"
     },

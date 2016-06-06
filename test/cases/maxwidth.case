@@ -1,0 +1,9 @@
+[{"name":"trent","age":38}, {"name":"ewan","age":4}]
+
+NAME  AGE
+trent  38
+ewan  4
+
+{
+    "columns": [{"lookup": "name", "maxWidth": 4}, "age"]
+}
