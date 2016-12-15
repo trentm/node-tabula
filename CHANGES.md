@@ -1,9 +1,13 @@
 # node-tabula changelog
 
-## 1.8.1 (not yet released)
+## not yet released
 
 (nothing yet)
 
+## 1.9.0
+
+- Table content should be `''` and not `'\n'` if there is no output (no output
+  results from both `opts.skipHeader` and there being no rows).
 
 ## 1.8.0
 

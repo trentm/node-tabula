@@ -1,0 +1,8 @@
+[]
+
+
+
+{
+    "columns": ["name", "age"],
+    "skipHeader": true
+}

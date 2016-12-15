@@ -54,9 +54,10 @@ cases.forEach(function (c) {
         return;
     }
     test(testName, function (t) {
-        debug('--', testName)
-        debug('case: %s', JSON.stringify(c, null, 4))
+        debug('--', testName);
+        debug('case: %s', JSON.stringify(c, null, 4));
         var table = tabula.format(c.items, c.options);
+        debug('got: %j', table);
         t.equal(table, c.expect.stdout);
         t.end();
     });
