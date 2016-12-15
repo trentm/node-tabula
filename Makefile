@@ -47,7 +47,7 @@ check: check-jsstyle versioncheck
 # Ensure CHANGES.md and package.json have the same version after a
 # "## not yet released" section intended for unreleased changes.
 .PHONY: versioncheck
-versioncheck: | node_modules
+versioncheck:
 	@echo version is: $(shell cat package.json | $(JSON) version)
 	[ `cat package.json | $(JSON) version` \
 	    = `grep '^## ' CHANGES.md | head -2 | tail -1 | awk '{print $$2}'` ]
