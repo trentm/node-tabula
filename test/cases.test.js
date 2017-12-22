@@ -42,7 +42,7 @@ var cases = caseFiles.map(function (caseFile) {
         expect: {
             stdout: (data[1] ? data[1].trim() + '\n' : '')
         },
-        options: (data[2] ? JSON.parse(data[2]) : undefined)
+        options: (data[2] ? eval(';(_=' + data[2] + ');') : undefined)
     };
 });
 debug('cases:', JSON.stringify(cases, null, 4));
