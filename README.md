@@ -63,6 +63,7 @@ trent  38
 - document column align=right
 - document opts.noAnsi
 - document column width, maxWidth 
+- document sort.*.keyFunc
 
 
 # `tabula` CLI

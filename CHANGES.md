@@ -2,7 +2,7 @@
 
 ## not yet released
 
-(nothing yet)
+- [pull #5] Support `keyFunc` for finer sorting control.
 
 ## 1.9.0
 
