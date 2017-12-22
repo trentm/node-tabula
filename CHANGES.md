@@ -2,6 +2,10 @@
 
 ## not yet released
 
+(nothing yet)
+
+## 1.10.0
+
 - [pull #5] Support `keyFunc` for finer sorting control.
 
 ## 1.9.0
