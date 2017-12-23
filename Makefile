@@ -1,11 +1,15 @@
 
-NODEUNIT = ./node_modules/.bin/nodeunit
 JSSTYLE_FILES := $(shell find lib test -name "*.js")
 NODEOPT ?= $(HOME)/opt
+JSFILES := bin/jirash $(shell find lib -name '*.js')
+
+NODEUNIT = ./node_modules/.bin/nodeunit
+ESLINT = ./node_modules/.bin/eslint
+PRETTIER = ./node_modules/.bin/prettier
 JSON ?= json
 
 
-all $(NODEUNIT):
+all $(ESLINT) $(PRETTIER) $(NODEUNIT):
 	npm install
 
 .PHONY: distclean
@@ -36,25 +40,45 @@ test08:
 	PATH="$(NODEOPT)/node-0.8/bin:$(PATH)" make test
 
 
-.PHONY: check-jsstyle
-check-jsstyle: $(JSSTYLE_FILES)
-	./tools/jsstyle -o indent=4,doxygen,unparenthesized-return=0,blank-after-start-comment=0,leading-right-paren-ok $(JSSTYLE_FILES)
+.PHONY: check-eslint
+check-eslint: | $(ESLINT)
+	$(ESLINT) $(JSFILES)
 
-.PHONY: check
-check: check-jsstyle versioncheck
-	@echo "Check ok."
+.PHONY: check-prettier
+check-prettier: | $(PRETTIER)
+	@echo "# Checking formatting. Re-run 'make fmt' if this fails."
+	$(PRETTIER) --list-different $(JSFILES)
 
 # Ensure CHANGES.md and package.json have the same version after a
 # "## not yet released" section intended for unreleased changes.
-.PHONY: versioncheck
-versioncheck:
+.PHONY: check-version
+check-version:
 	@echo version is: $(shell cat package.json | $(JSON) version)
 	[ `cat package.json | $(JSON) version` \
 	    = `grep '^## ' CHANGES.md | head -2 | tail -1 | awk '{print $$2}'` ]
 
+.PHONY: check
+check:: check-version check-eslint check-prettier
+	@echo "Check ok."
+
+
+# Prettier formatting before eslint, because otherwise `make fmt` will stop on
+# a line >80 chars that prettier could otherwise have fixed.
+.PHONY: fmt
+fmt:: fmt-prettier fmt-eslint
+
+.PHONY: fmt-eslint
+fmt-eslint: | $(ESLINT)
+	$(ESLINT) --fix $(JSFILES)
+
+.PHONY: fmt-prettier
+fmt-prettier: | $(PRETTIER)
+	$(PRETTIER) --write $(JSFILES)
+
+
 # Confirm, then tag and publish the current version.
 .PHONY: cutarelease
-cutarelease: versioncheck
+cutarelease: check
 	[ -z "`git status --short`" ]  # If this fails, the working dir is dirty.
 	@ver=$(shell $(JSON) -f package.json version) && \
 	    name=$(shell $(JSON) -f package.json name) && \
