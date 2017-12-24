@@ -38,7 +38,8 @@ var cases = caseFiles.map(function (caseFile) {
     debug('parse "%s": data:', caseFile, data);
     return {
         name: path.basename(caseFile).slice(0, -5),
-        items: JSON.parse(data[0]),
+        // Use `eval` to allow ANSI escape codes in table data.
+        items: eval(';(_=' + data[0] + ');'),
         expect: {
             stdout: (data[1] ? data[1].trim() + '\n' : '')
         },
