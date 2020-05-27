@@ -3,13 +3,13 @@ JSSTYLE_FILES := $(shell find lib test -name "*.js")
 NODEOPT ?= $(HOME)/opt
 JSFILES := bin/jirash $(shell find lib -name '*.js')
 
-NODEUNIT = ./node_modules/.bin/nodeunit
+TAPE = ./node_modules/.bin/tape
 ESLINT = ./node_modules/.bin/eslint
 PRETTIER = ./node_modules/.bin/prettier
 JSON ?= json
 
 
-all $(ESLINT) $(PRETTIER) $(NODEUNIT):
+all $(ESLINT) $(PRETTIER) $(TAPE):
 	npm install
 
 .PHONY: distclean
@@ -18,8 +18,8 @@ distclean:
 
 
 .PHONY: test
-test: | $(NODEUNIT)
-	$(NODEUNIT) test/*.test.js
+test: | $(TAPE)
+	$(TAPE) test/*.test.js
 
 .PHONY: testall
 testall: test10 test08 test11

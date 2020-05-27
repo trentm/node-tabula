@@ -23,13 +23,13 @@
   "dependencies": {
     "assert-plus": "^1.0.0",
     "dashdash": "1.x >=1.8",
-    "lstream": "0.0.4"
+    "verror": "^1.10.0"
   },
   "devDependencies": {
     "eslint": "^4.13.1",
     "eslint-plugin-joyent": "^2.0.0",
     "glob": "4.0.x",
-    "nodeunit": "0.9.x",
+    "tape": "^4.2.0",
     "prettier": "^1.9.2"
   },
   "scripts": {

@@ -1,0 +1,77 @@
+START HERE:
+- 'make test' is failing on case: 101-rows-flat
+    - why? Because tabula.format has Infinity. So it is doing the right thing
+      but the test suite doesn't know to adapt.
+- XXXs in code, e.g. the time-based trigger of calcCols
+- test with slow emit of lines
+- re-consider the incompat for the *lib* on 'dottedLookup'. might just be
+  a compat pain?
+- validFields incompat:
+    Replace with strictLookups bool? I.e. error if get undefined/error
+    on lookup?
+- docs
+- tests: add tests for streamed input
+- clean up CLI, then -> tabula file name
+- other TODOs above
+
+
+# next
+
+- 2.x major ver bump incompat change:
+    - dotted-lookup by default for CLI
+    - drop `validFields`? Is it useful at all?
+- make `tabula` CLI useful/robust
+    - This exits, which is wrong:
+        yes '{"name":"Trent","age":41}' | tabula
+      Does this need a whole re-write for streaming?
+    - exeunt?
+    - dotted-lookup by default? major ver bump?
+    - support paging with less a la bunyan?
+- s/nodeunit/tape
+- verror usage
+- update eslint rules?
+- ref docs
+- tabula feature: redetermine columns in stream renderer if it looks like
+  data has changed for a better fit. An example might be a column of integers
+  increasing to have an extra digit.
+- tabula feature: current syntax for columsn is `$lookup[:$label]`, add
+  other options like: alignment, width
+- tabula feature: Highlighting cells in red for certain criteria?
+- `tabula -h` output should explain "<columns>"
+
+
+
+# stream design
+
+- input stream of lines
+- pipe to parse rows
+    - error on parse fail, option to skip those lines, e.g. for bunyan logs
+    - what should default be? Would suck if tended to die unless remembered
+      the option. Perhaps a `--strict`, so skip by default. Red warning
+      line for non-parsable line. `-q` to disable those.
+- pipe to renderer of rows, buffer up to N rows (default 100?) for up to N
+  seconds after first row (default 1s?) to determine widths and columns
+  (if columns not specified).
+- option to override the N rows, perhaps to force *no* streaming mode so the
+  whole dataset is considered for alignment
+
+
+# dev on tab2 stream
+
+echo '{"foo":1, "bar":2}
+{"foo":3, "bar":4}' | tab2
+
+echo '{"foo":1, "bar":2}' | tab2
+
+echo '[{"foo":1, "bar":2}]' | tab2
+
+echo '[
+ {"foo":1, "bar":2},
+{"foo":3, "bar":4}
+]' | tab2
+
+yes '{"foo":1, "bar":2}' | tab2
+
+cat large-bunyan.log | tab2 time req.method req.path res.statusCode msg
+
+ cat tmp/foo.log | head | tab2 -q --strict

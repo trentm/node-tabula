@@ -1,8 +1,12 @@
 # node-tabula changelog
 
-## not yet released
+## 2.x (not yet released)
 
-(nothing yet)
+- Drop support for `opts.validFields`. I don't see the value.
+- Drop `opts.dottedLookup` and make it the default. Please open a ticket if
+  you have a use case for *not* doing dottedLookup.
+    XXX keep 'dottedLookup' opt in `sortArrayOfObjects`? I *do* know of users
+        there. Hrm.
 
 ## 1.10.0
 

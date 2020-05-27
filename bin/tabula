@@ -1,27 +1,23 @@
 #!/usr/bin/env node
-/**
- * -*- mode: js -*-
- *
- * tabula -- filter a stream of JSON objects into a formatted text table
- */
 
-var p = console.log;
-var debug = console.warn;
-//var debug = function () {};
+//
+// tabula -- filter a stream of JSON objects into a formatted text table
+//
 
 var assert = require('assert-plus');
 var dashdash = require('dashdash');
+var exeunt = require('exeunt');
+var fs = require('fs');
 var util = require('util');
+var VError = require('verror');
 
-var pkg = require('../package.json');
-var LineStream = require('lstream');
-var tabula = require('../lib/tabula');
-
-
+var LinesFromTextStream = require('../lib/lines-from-text-stream');
+var ObjsFromJsonStream = require('../lib/objs-from-json-stream');
+var tabula = require('../');
 
 //---- globals and constants
 
-var options = [
+var OPTIONS = [
     {
         name: 'version',
         type: 'bool',
@@ -33,14 +29,33 @@ var options = [
         help: 'Print this help and exit.'
     },
     {
+        names: ['strict'],
+        type: 'bool',
+        help: 'Treat a non-JSON input line as an error. By default, only a '
+            + 'warning is printed each non-JSON input line.'
+    },
+    {
+        names: ['quiet', 'q'],
+        type: 'bool',
+        help: 'Do not print warnings for non-JSON input lines.'
+    },
+    {
         names: ['flip'],
         type: 'bool',
         hidden: true
     },
     {
+        names: ['file', 'f'],
+        type: 'string',
+        help: 'File to process. If not given, input is read from stdin.',
+        helpArg: 'FILE'
+    },
+    {
         names: ['sort', 's'],
-        type: 'arrayOfString',
-        help: 'Sort on the given field. Can be specified multiple times.',
+        type: 'arrayOfCommaSepString',
+        help: 'Sort on the given field. Use multiple times for sub-sorting. '
+            + 'Prefix a field with "-" to reverse sort, '
+            + 'e.g. `-s -lastName -s firstName`.',
         helpArg: 'FIELD'
     },
     {
@@ -49,117 +64,151 @@ var options = [
         help: 'Skip header.'
     },
     {
-        names: ['dotted-lookup'],
+        names: ['no-color'],
+        env: 'TABULA_NO_COLOR',
         type: 'bool',
-        help: 'Support dotted lookup for fields. I.e. "foo.bar" means "the '
-            + 'bar property of the foo object".'
-    }
-    // TODO
-    //{
-    //    names: ['file', 'f'],
-    //    type: 'string',
-    //    help: 'File to process',
-    //    helpArg: 'FILE'
-    //}
+        help: 'Force no coloring of output.'
+    },
 ];
 
 
+// ---- internal support stuff
 
-//---- support functions
+function parseCommaSepStringNoEmpties(option, optstr, arg) {
+    return arg.trim().split(/\s*,\s*/g)
+        .filter(function (part) { return part; });
+}
 
-/**
- * A hacked up version of 'process.exit' that will first drain stdout
- * before exiting. *WARNING: This doesn't stop event processing.* IOW,
- * callers have to be careful that code following this call isn't
- * accidentally executed.
- */
-function drainStdoutAndExit(code) {
-    debug('(drainStdoutAndExit(%d))', code);
-    stdout.on('drain', function () {
-        cleanupAndExit(code);
-    });
-    if (stdoutFlushed) {
-        cleanupAndExit(code);
+dashdash.addOptionType({
+    name: 'commaSepString',
+    takesArg: true,
+    helpArg: 'STRING',
+    parseArg: parseCommaSepStringNoEmpties
+});
+
+dashdash.addOptionType({
+    name: 'arrayOfCommaSepString',
+    takesArg: true,
+    helpArg: 'STRING',
+    parseArg: parseCommaSepStringNoEmpties,
+    array: true,
+    arrayFlatten: true
+});
+
+// Internal debug logging via `console.warn`.
+var _selfTrace = function selfTraceNoop() {};
+if (process.env.TABULA_SELF_TRACE === '1') {
+    _selfTrace = function selfTrace() {
+        process.stderr.write('[tabula self-trace] ');
+        console.warn.apply(null, arguments);
     }
 }
 
+function onStreamError(err) {
+    console.error('tabula: error: %s', err.message);
+    exeunt(1);
+};
 
-/**
- * A hacked up version of 'process.exit' that will first drain stdout
- * before exiting. *WARNING: This doesn't stop event processing.* IOW,
- * callers have to be careful that code following this call isn't
- * accidentally executed.
- */
-var _drainingStdout = false;
-function drainStdoutAndExit(stdout, code) {
-    if (_drainingStdout) {
-        return;
+// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
+// Suggested colors (some are unreadable in common cases):
+// - Good: cyan, yellow (limited use), bold, green, magenta, red
+// - Bad: blue (not visible on cmd.exe), grey (same color as background on
+//   Solarized Dark theme from <https://github.com/altercation/solarized>, see
+//   issue #160)
+var colors = {
+    bold: [1, 22],
+    italic: [3, 23],
+    underline: [4, 24],
+    inverse: [7, 27],
+    white: [37, 39],
+    grey: [90, 39],
+    black: [30, 39],
+    blue: [34, 39],
+    cyan: [36, 39],
+    green: [32, 39],
+    magenta: [35, 39],
+    red: [31, 39],
+    yellow: [33, 39]
+};
+
+function stylizeWithColor(str, color) {
+    if (!str) {
+        return '';
     }
-    _drainingStdout = true;
-    stdout.on('drain', function () {
-        process.exit(code);
-    });
-    stdout.on('close', function () {
-        process.exit(code);
-    });
-    stdout.write('');
-    //XXX needed?
-    //if (stdoutFlushed) {
-    //    process.exit(code);
-    //}
+    var codes = colors[color];
+    if (codes) {
+        // eslint-disable-next-line no-octal-escape
+        return '\033[' + codes[0] + 'm' + str + '\033[' + codes[1] + 'm';
+    } else {
+        return str;
+    }
 }
 
-
+function stylizeWithoutColor(str, _color) {
+    return str;
+}
 
 
 // ---- mainline
 
-function main(argv) {
-    var parser = dashdash.createParser({options: options});
+function main() {
+    var parser = dashdash.createParser({options: OPTIONS});
     try {
         var opts = parser.parse(process.argv);
-    } catch (e) {
-        console.error('tabula: error: %s', e.message);
-        process.exit(1);
+    } catch (optsErr) {
+        console.error('tabula: error: %s', optsErr.message);
+        exeunt(1);
+        return;
     }
 
     if (opts.help) {
         var help = parser.help({includeEnv: true}).trimRight();
-        p('Filter a JSON object stream into a table, with a column for each\n'
-            + 'key, or selected keys. The input must be either a JSON array\n'
-            + 'of objects or a newline-separated JSON object with one object\n'
-            + 'per line.\n'
-            + '\n'
-            + 'Usage:\n'
-            + '    tabula [<options>] [<keys>...]\n'
-            + '\n'
-            + 'Options:\n'
-            + help + '\n'
-            + '\n'
-            + 'Examples:\n'
-            // JSSTYLED
-            + '    $ echo \'[{"name":"Trent","age":41},{"name":"Ewan","age":7}]\' | tabula\n'
-            + '    NAME   AGE\n'
-            + '    Trent  41\n'
-            + '    Ewan   7\n'
-            + '\n'
-            + '    # Explicit list columns. Use "lookup:name" to set column\n'
-            + '    # header "name".\n'
-            // JSSTYLED
-            + '    $ echo \'[{"name":"Trent","age":41},{"name":"Ewan","age":7}]\' | tabula name age:YEARS\n'
-            + '    NAME   YEARS\n'
-            + '    Trent  41\n'
-            + '    Ewan   7');
-        process.exit(0);
+        console.log([
+            'Filter a JSON object stream into a table, with a column for each key, or',
+            'selected keys. The input must be either a JSON array of objects or a',
+            'newline-separated JSON object with one object per line.',
+            '',
+            'Usage:',
+            '    tabula -f FILE [<options>] [<columns>...] ',
+            '    ... | tabula [<options>] [<columns>...]    # read from stdin',
+            '',
+            'Options:',
+            help,
+            '',
+            'Examples:',
+            '    $ echo \'[{"name":"Trent","age":41},{"name":"Ewan","age":7}]\' | tabula',
+            '    NAME   AGE',
+            '    Trent  41',
+            '    Ewan   7',
+            '',
+            '    # Explicit list columns. Use "lookup:name" to set column header "name".',
+            '    $ echo \'[{"name":"Trent","age":41},{"name":"Ewan","age":7}]\' \\',
+            '        | tabula name age:YEARS',
+            '    NAME   YEARS',
+            '    Trent  41',
+            '    Ewan   7'
+        ].join('\n'));
+        return;
     } else if (opts.version) {
-        p('tabula ' + pkg.version);
-        p(pkg.homepage);
-        process.exit(0);
+        var packageJson = path.resolve(__dirname, '../package.json');
+        var pkg = JSON.parse(fs.readFileSync(packageJson));
+        console.log('tabula ' + pkg.version);
+        console.log(pkg.homepage);
+        return;
     } else if (opts.flip) {
-        p('(╯°□°)╯︵ ┻━┻');
-        process.exit(0);
+        console.log('(╯°□°)╯︵ ┻━┻');
+        return;
     }
 
+    var color;
+    if (opts.no_color) {
+        color = false;
+    } else {
+        color = process.stdout.isTTY ? true : false;
+    }
+    var stylize = color ? stylizeWithColor : stylizeWithoutColor;
+
+    // Args specify table columns.
     var columns;
     if (opts._args.length) {
         //  "bar" -> {"lookup": "bar"}
@@ -178,89 +227,56 @@ function main(argv) {
         }
     }
 
-    // Stdout error handling.
-    var stdout = process.stdout;
-    stdout.on('error', function (err) {
-        debug('(stdout error event: %s)', err);
-        if (err.code === 'EPIPE') {
-            drainStdoutAndExit(stdout, 0);
-        } else {
-            console.warn(err);
-            drainStdoutAndExit(stdout, 1);
+    var inputStream;
+    if (opts.file) {
+        inputStream = fs.createReadStream(opts.file, {encoding: 'utf8'});
+    } else {
+        inputStream = process.stdin;
+    }
+    inputStream.on('error', onStreamError);
+
+    var lineStream = new LinesFromTextStream({encoding: 'utf8'});
+    lineStream.on('error', onStreamError);
+
+    var objStream = new ObjsFromJsonStream();
+    objStream.on('error', onStreamError);
+    if (opts.strict) {
+        objStream.on('lineParseError', onStreamError);
+    } else if (!opts.quiet) {
+        objStream.on('lineParseError', function onLineParseError(err) {
+            console.warn(stylize('tabula: warn: %s', 'red'), err.message);
+        });
+    }
+
+    var renderStream = new tabula.Stream({
+        columns: columns,
+        skipHeader: opts.H,
+        sort: opts.sort
+    });
+    renderStream.on('error', onStreamError);
+    objStream.on('inputIsArray', function updateBuffering(inputIsArray) {
+        // If the input is a JSON Array, then let's not have the rendering
+        // calculate widths until it has all the rows, given that we are
+        // buffering the full array in memory anyway.
+        if (inputIsArray) {
+            renderStream.numBufferRows = Infinity;
         }
     });
 
-    if (opts.file) {
-        XXX  // TODO
-        var files = opts.args;
-        files.forEach(function (file) {
-            streams[file] = { stream: null, records: [], done: false }
-        });
-        asyncForEach(files,
-            function (file, next) {
-                processFile(file, opts, stylize, function (err) {
-                    if (err) {
-                        warn('bunyan: %s', err.message);
-                        retval += 1;
-                    }
-                    next();
-                });
-            },
-            function (err) {
-                if (err) {
-                    warn('bunyan: unexpected error: %s', err.stack || err);
-                    return drainStdoutAndExit(stdout, 1);
-                }
-                process.exit(retval);
-            }
-        );
-    } else {
-        var lstream = new LineStream({encoding: 'utf8'});
-        lstream.on('error', function (err) {
-            warn(err);
-            drainStdoutAndExit(1);
-        });
-
-        var oneArray = undefined;
-        var items = [];
-        var lines = [];
-        lstream.on('line', function (line) {
-            line = line.trim();
-            if (!line) {
-                return;
-            }
-            if (oneArray === undefined) {  //XXX use .once() for this setup?
-                if (line[0] === '[') {
-                    oneArray = true;
-                }
-            }
-            if (oneArray) {
-                // TODO: would be faster to NOT lstream now, but just chunks.
-                lines.push(line);
-            } else {
-                // TODO: *streaming* into tabula
-                items.push(JSON.parse(line));
-            }
-        });
-
-        //XXX I thought this needed to be `lstream.once('end', ...)` but that
-        //    does nothing for me!?
-        process.stdin.once('end', function () {
-            if (oneArray) {
-                items = JSON.parse(lines.join('\n'));
-            }
-            tabula(items, {
-                columns: columns,
-                sort: opts.sort,
-                skipHeader: opts.H,
-                dottedLookup: opts.dotted_lookup
-            });
-        });
-
-        process.stdin.pipe(lstream);
-    }
+    inputStream
+        .pipe(lineStream)
+        .pipe(objStream)
+        .pipe(renderStream)
+        .pipe(process.stdout);
 }
 
+
 if (require.main === module) {
+    process.stdout.on('error', function onStdoutError(err) {
+        if (err.code === 'EPIPE') {
+            process.exit(0);
+        }
+    });
+
     main(process.argv);
 }

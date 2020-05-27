@@ -2,20 +2,16 @@
  * tabula test of various input/output cases
  */
 
-var util = require('util'),
-    format = util.format;
+var format = require('util').format;
 var fs = require('fs');
 var glob = require('glob');
 var path = require('path');
+var stream = require('stream');
+var test = require('tape');
 
-// node-tap API
-if (require.cache[__dirname + '/tap4nodeunit.js'])
-    delete require.cache[__dirname + '/tap4nodeunit.js'];
-var test = require('./tap4nodeunit.js').test;
-
+var LinesFromTextStream = require('../lib/lines-from-text-stream');
+var ObjsFromJsonStream = require('../lib/objs-from-json-stream');
 var tabula = require('../lib/tabula');
-
-
 
 // ---- globals
 
@@ -38,8 +34,9 @@ var cases = caseFiles.map(function (caseFile) {
     debug('parse "%s": data:', caseFile, data);
     return {
         name: path.basename(caseFile).slice(0, -5),
-        // Use `eval` to allow ANSI escape codes in table data.
-        items: eval(';(_=' + data[0] + ');'),
+        // XXX
+        //items: JSON.parse(data[0]),
+        text: data[0],
         expect: {
             stdout: (data[1] ? data[1].trim() + '\n' : '')
         },
@@ -54,22 +51,61 @@ cases.forEach(function (c) {
     if (TEST_FILTER && !~testName.indexOf(TEST_FILTER)) {
         return;
     }
+
     test(testName, function (t) {
         debug('--', testName);
         debug('case: %s', JSON.stringify(c, null, 4));
-        var table = tabula.format(c.items, c.options);
-        debug('got: %j', table);
-        t.equal(table, c.expect.stdout);
-        t.end();
+
+        // Setup a pipeline of the test case "text" through to `tabula.Stream`.
+        var inputStream = new stream.Readable();
+        var lineStream = new LinesFromTextStream({encoding: 'utf8'});
+        var objStream = new ObjsFromJsonStream();
+        var renderStream = new tabula.Stream(c.options);
+        objStream.on('inputIsArray', function updateBuffering(inputIsArray) {
+            if (inputIsArray) {
+                renderStream.numBufferRows = Infinity;
+            }
+        });
+        inputStream
+            .pipe(lineStream)
+            .pipe(objStream)
+            .pipe(renderStream);
+
+        // Gather the rendered table.
+        var tableBits = [];
+        renderStream.on('readable', function renderReadable() {
+            var tableBit;
+            while (null !== (tableBit = renderStream.read())) {
+                tableBits.push(tableBit);
+            }
+        });
+
+        // Also gather the parsed items with which to test `tabula.format(...)`.
+        var items = [];
+        var itemsStream = new ObjsFromJsonStream();
+        lineStream.pipe(itemsStream);
+        itemsStream.on('readable', function itemsReadable() {
+            var item;
+            while (null !== (item = itemsStream.read())) {
+                items.push(item);
+            }
+        });
+
+        renderStream.on('end', function () {
+            var table = tableBits.join('');
+            debug('got: %j', table);
+            t.equal(table, c.expect.stdout, 'tabula.Stream matches expected');
+
+            var fTable = tabula.format(items, c.options);
+            t.equal(fTable, c.expect.stdout, 'tabula.format matches expected');
+
+            t.end();
+        });
+
+        c.text.split(/\n/g).forEach(function (line) {
+            inputStream.push(line + '\n');
+        });
+        inputStream.push(null);
     });
-});
 
-
-test('manual case: function-cell', function (t) {
-    var items = [
-        {foo: 'bar', func: function aFunc() {}}
-    ];
-    var table = tabula.format(items);
-    t.equal(table, 'FOO  FUNC\nbar  [Function: aFunc]\n');
-    t.end();
 });
