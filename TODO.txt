@@ -1,0 +1,7 @@
+- make `tabula` CLI useful/robust
+    - This exits, which is wrong:
+        yes '{"name":"Trent","age":41}' | tabula
+      Does this need a whole re-write for streaming?
+    - exeunt?
+    - dotted-lookup by default? major ver bump?
+- ref docs
